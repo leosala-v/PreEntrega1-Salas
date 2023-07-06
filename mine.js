@@ -21,7 +21,7 @@ const servicios = {
   const precioServicio = servicios[servicioSeleccionado];
   
 /* Verificar si el servicio existe en el objeto de precios */
-  if (precioServicio !=== undefined) {
+  if (precioServicio !== undefined) {
 
 /* Calcular el precio con descuento */
     const precioConDescuento = calcularPrecioConDescuento(precioServicio, descuento);
