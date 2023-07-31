@@ -4,17 +4,6 @@ const servicios = {
   vitaminaC: { precio: 300, descripcion: "Tratamiento con vitamina C para mejorar la luminosidad de la piel." },
 };
 
-const calcularPrecioConDescuento = (precio, descuento) => precio * (1 - descuento / 100);
-
-const agregarProducto = (productosSeleccionados, servicio, cantidad = 1) => {
-  const productoExistente = productosSeleccionados.find((producto) => producto.servicio === servicio);
-  if (productoExistente) {
-    productoExistente.cantidad += cantidad;
-  } else {
-    productosSeleccionados.push({ servicio, cantidad });
-  }
-};
-
 const eliminarProducto = (productosSeleccionados, servicio, cantidad = 1) => {
   const productoExistente = productosSeleccionados.find((producto) => producto.servicio === servicio);
   if (productoExistente) {
@@ -31,13 +20,13 @@ const mostrarCarrito = (productosSeleccionados) => {
   productosSeleccionados.forEach((producto) => {
     const { servicio, cantidad } = producto;
     const { precio, descripcion } = servicios[servicio];
-    const precioTotal = calcularPrecioConDescuento(precio * cantidad, 10); // Supongamos un descuento del 10%
+    const precioTotal = calcularPrecioConDescuento(precio * cantidad, 10); 
     console.log(`- ${cantidad}x ${servicio}: ${descripcion} - Precio: $${precioTotal.toFixed(2)}`);
   });
   const precioTotalCarrito = productosSeleccionados.reduce((total, producto) => {
     const { servicio, cantidad } = producto;
     const { precio } = servicios[servicio];
-    return total + calcularPrecioConDescuento(precio * cantidad, 10); // Supongamos un descuento del 10%
+    return total + calcularPrecioConDescuento(precio * cantidad, 10); 
   }, 0);
   console.log(`Precio total del carrito: $${precioTotalCarrito.toFixed(2)}`);
   return precioTotalCarrito;
@@ -49,7 +38,7 @@ const interactuarConUsuario = () => {
   console.log("Bienvenido a la tienda de tratamientos estéticos.");
   while (true) {
     const opcion = prompt(
-      "¿Qué deseas hacer?\n1. Agregar producto\n2. Eliminar producto\n3. Mostrar carrito\n4. Salir"
+      "¿Qué deseas hacer?\n1. Agregar producto\n2. Eliminar producto\n3. Calcular precio con descuento\n4. Mostrar carrito \n5. Salir"
     ).toLowerCase();
 
     switch (opcion) {
@@ -68,10 +57,16 @@ const interactuarConUsuario = () => {
         break;
 
       case "3":
-        mostrarCarrito(carritoProductos);
+        const descuento = parseFloat(prompt("Ingrese el descuento (por ejemplo, 15 para un 15% de descuento):"));
+        const precioTotalConDescuento = mostrarCarrito(carritoProductos) - (mostrarCarrito(carritoProductos) * descuento / 100);
+        console.log(`Precio total con descuento : $${precioTotalConDescuento.toFixed(2)}`);
         break;
 
       case "4":
+        mostrarCarrito(carritoProductos);
+        break;
+
+      case "5":
         console.log("Gracias por utilizar nuestro servicio. ¡Hasta luego!");
         return;
 
