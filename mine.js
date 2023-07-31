@@ -1,61 +1,84 @@
 const servicios = {
-  botox: 100,
-  acido: 200,
-  vitaminaC: 300,
+  botox: { precio: 100, descripcion: "Tratamiento de botox para rejuvenecer la piel." },
+  acido: { precio: 200, descripcion: "Tratamiento con ácido hialurónico para hidratar la piel." },
+  vitaminaC: { precio: 300, descripcion: "Tratamiento con vitamina C para mejorar la luminosidad de la piel." },
 };
 
-const productos = [];
+const calcularPrecioConDescuento = (precio, descuento) => precio * (1 - descuento / 100);
 
-function calcularPrecioConDescuento(precio, descuento) {
-  const porcentajeDescuento = descuento / 100;
-  const montoDescuento = precio * porcentajeDescuento;
-  const precioConDescuento = precio - montoDescuento;
-  return precioConDescuento;
-}
+const agregarProducto = (productosSeleccionados, servicio, cantidad = 1) => {
+  const productoExistente = productosSeleccionados.find((producto) => producto.servicio === servicio);
+  if (productoExistente) {
+    productoExistente.cantidad += cantidad;
+  } else {
+    productosSeleccionados.push({ servicio, cantidad });
+  }
+};
 
-function agregarProducto(modelo, precio) {
-  const producto = {
-    modelo: modelo,
-    precio: precio,
-  };
-  productos.push(producto);
-}
+const eliminarProducto = (productosSeleccionados, servicio, cantidad = 1) => {
+  const productoExistente = productosSeleccionados.find((producto) => producto.servicio === servicio);
+  if (productoExistente) {
+    productoExistente.cantidad -= cantidad;
+    if (productoExistente.cantidad <= 0) {
+      const index = productosSeleccionados.indexOf(productoExistente);
+      productosSeleccionados.splice(index, 1);
+    }
+  }
+};
 
-function buscarProductoPorModelo(modelo) {
-  return productos.find((producto) => producto.modelo === modelo);
-}
-
-function buscarProductosPorPrecio(precio) {
-  return productos.filter((producto) => producto.precio === precio);
-}
-
-function calcularPrecioTotalCarrito() {
-  let total = 0;
-  productos.forEach((producto) => {
-    total += producto.precio;
+const mostrarCarrito = (productosSeleccionados) => {
+  console.log("Carrito de productos:");
+  productosSeleccionados.forEach((producto) => {
+    const { servicio, cantidad } = producto;
+    const { precio, descripcion } = servicios[servicio];
+    const precioTotal = calcularPrecioConDescuento(precio * cantidad, 10); // Supongamos un descuento del 10%
+    console.log(`- ${cantidad}x ${servicio}: ${descripcion} - Precio: $${precioTotal.toFixed(2)}`);
   });
-  return total;
-}
+  const precioTotalCarrito = productosSeleccionados.reduce((total, producto) => {
+    const { servicio, cantidad } = producto;
+    const { precio } = servicios[servicio];
+    return total + calcularPrecioConDescuento(precio * cantidad, 10); // Supongamos un descuento del 10%
+  }, 0);
+  console.log(`Precio total del carrito: $${precioTotalCarrito.toFixed(2)}`);
+  return precioTotalCarrito;
+};
 
-// Agregar productos de estética facial
-agregarProducto("cremaFacial", 50);
-agregarProducto("mascarilla", 25);
+const carritoProductos = [];
 
-// Mostrar cuadro de precios y valor del carrito
-function mostrarCuadroPrecios() {
-  console.log("---- Precios ----");
-  Object.entries(servicios).forEach(([producto, precio]) => {
-    console.log(`${producto}: $${precio}`);
-  });
+const interactuarConUsuario = () => {
+  console.log("Bienvenido a la tienda de tratamientos estéticos.");
+  while (true) {
+    const opcion = prompt(
+      "¿Qué deseas hacer?\n1. Agregar producto\n2. Eliminar producto\n3. Mostrar carrito\n4. Salir"
+    ).toLowerCase();
 
-  console.log("Productos en el carrito:");
-  productos.forEach((producto) => {
-    console.log(`${producto.modelo}: $${producto.precio}`);
-  });
+    switch (opcion) {
+      case "1":
+        const servicioAgregar = prompt("Ingrese el servicio a agregar (botox, acido o vitaminaC):").toLowerCase();
+        const cantidadAgregar = parseInt(prompt("Ingrese la cantidad a agregar:"));
+        agregarProducto(carritoProductos, servicioAgregar, cantidadAgregar);
+        console.log(`Se han agregado ${cantidadAgregar}x ${servicioAgregar} al carrito.`);
+        break;
 
-  const precioTotalCarrito = calcularPrecioTotalCarrito();
-  console.log("---------------------------");
-  console.log(`Total carrito: $${precioTotalCarrito}`);
-}
+      case "2":
+        const servicioEliminar = prompt("Ingrese el servicio a eliminar (botox, acido o vitaminaC):").toLowerCase();
+        const cantidadEliminar = parseInt(prompt("Ingrese la cantidad a eliminar:"));
+        eliminarProducto(carritoProductos, servicioEliminar, cantidadEliminar);
+        console.log(`Se han eliminado ${cantidadEliminar}x ${servicioEliminar} del carrito.`);
+        break;
 
-mostrarCuadroPrecios();
+      case "3":
+        mostrarCarrito(carritoProductos);
+        break;
+
+      case "4":
+        console.log("Gracias por utilizar nuestro servicio. ¡Hasta luego!");
+        return;
+
+      default:
+        console.log("Opción inválida. Por favor, ingresa una opción válida.");
+    }
+  }
+};
+
+interactuarConUsuario();
