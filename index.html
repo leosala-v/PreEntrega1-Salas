@@ -1,14 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./estilo.css">
+  <title>Tienda de Tratamientos Estéticos</title>
 </head>
 <body>
+  <header>
+    <h1>Tienda de Tratamientos Estéticos</h1>
+  </header>
+  <div class="container">
+    <h2>¡Bienvenido!</h2>
+    <p>Selecciona una opción:</p>
+    <div class="cards-container">
+      <div class="card">
+        <h3>Botox</h3>
+        <p>Tratamiento de botox para rejuvenecer la piel.</p>
+        <p>Precio: $100</p>
+        <button class="agregar-producto" data-servicio="botox">Agregar al Carrito</button>
+      </div>
+      <div class="card">
+        <h3>Ácido Hialurónico</h3>
+        <p>Tratamiento con ácido hialurónico para hidratar la piel.</p>
+        <p>Precio: $200</p>
+        <button class="agregar-producto" data-servicio="acido">Agregar al Carrito</button>
+      </div>
+      <div class="card">
+        <h3>Vitamina C</h3>
+        <p>Tratamiento con vitamina C para mejorar la luminosidad de la piel.</p>
+        <p>Precio: $300</p>
+        <button class="agregar-producto" data-servicio="vitaminaC">Agregar al Carrito</button>
+      </div>
+    </div>
+    <button id="eliminarBtn">Eliminar Producto</button>
+    <button id="mostrarBtn">Mostrar Carrito</button>
+    <button id="descuentoBtn">Aplicar Descuento</button>
+    <button id="salirBtn">Salir</button>
+    <p>Precio Actualizado: <span id="precioActualizado">$0.00</span></p>
+  </div>
+  <ul id="carrito"></ul>
 
+  <script src="./mine.js"></script>
 
-
-    <script src="./mine.js"></script>
 </body>
 </html>

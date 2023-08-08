@@ -4,9 +4,31 @@ const servicios = {
   vitaminaC: { precio: 300, descripcion: "Tratamiento con vitamina C para mejorar la luminosidad de la piel." },
 };
 
+const carritoProductos = [];
+
+const carritoHTML = document.getElementById("carrito");
+const agregarBtns = document.querySelectorAll(".agregar-producto");
+const eliminarBtn = document.getElementById("eliminarBtn");
+const mostrarBtn = document.getElementById("mostrarBtn");
+const descuentoBtn = document.getElementById("descuentoBtn");
+const salirBtn = document.getElementById("salirBtn");
+const precioActualizadoElement = document.getElementById("precioActualizado");
+
 const calcularPrecioConDescuento = (precio, descuento) => precio * (1 - descuento / 100);
 
-const agregarProducto = (productosSeleccionados, servicio, cantidad = 1) => {
+const cargarCarritoDesdeLocalStorage = () => {
+  const carritoGuardado = localStorage.getItem("carrito");
+  if (carritoGuardado) {
+    const carritoParseado = JSON.parse(carritoGuardado);
+    carritoProductos.push(...carritoParseado);
+  }
+};
+
+const guardarCarritoEnLocalStorage = () => {
+  localStorage.setItem("carrito", JSON.stringify(carritoProductos));
+};
+
+const agregarProducto = (productosSeleccionados, servicio, cantidad) => {
   const productoExistente = productosSeleccionados.find((producto) => producto.servicio === servicio);
   if (productoExistente) {
     productoExistente.cantidad += cantidad;
@@ -21,7 +43,7 @@ const eliminarProducto = (productosSeleccionados, servicio, cantidad = 1) => {
     productoExistente.cantidad -= cantidad;
     if (productoExistente.cantidad <= 0) {
       const index = productosSeleccionados.indexOf(productoExistente);
-      productosSeleccionados.splice(index, 1);
+      index !== -1 && productosSeleccionados.splice(index, 1);
     }
   }
 };
@@ -43,48 +65,64 @@ const mostrarCarrito = (productosSeleccionados) => {
   return precioTotalCarrito;
 };
 
-const carritoProductos = [];
+window.addEventListener("load", () => {
+  cargarCarritoDesdeLocalStorage();
+  actualizarPrecioTotal();
+});
 
-const interactuarConUsuario = () => {
-  console.log("Bienvenido a la tienda de tratamientos estéticos.");
-  while (true) {
-    const opcion = prompt(
-      "¿Qué deseas hacer?\n1. Agregar producto\n2. Eliminar producto\n3. Mostrar carrito\n4. Calcular precio con descuento \n5. Salir"
-    ).toLowerCase();
-
-    switch (opcion) {
-      case "1":
-        const servicioAgregar = prompt("Ingrese el servicio a agregar (botox, acido o vitaminaC):").toLowerCase();
-        const cantidadAgregar = parseInt(prompt("Ingrese la cantidad a agregar:"));
-        agregarProducto(carritoProductos, servicioAgregar, cantidadAgregar);
-        console.log(`Se han agregado ${cantidadAgregar}x ${servicioAgregar} al carrito.`);
-        break;
-
-      case "2":
-        const servicioEliminar = prompt("Ingrese el servicio a eliminar (botox, acido o vitaminaC):").toLowerCase();
-        const cantidadEliminar = parseInt(prompt("Ingrese la cantidad a eliminar:"));
-        eliminarProducto(carritoProductos, servicioEliminar, cantidadEliminar);
-        console.log(`Se han eliminado ${cantidadEliminar}x ${servicioEliminar} del carrito.`);
-        break;
-
-      case "3":
-        mostrarCarrito(carritoProductos);
-        break;
-
-      case "4":
-        const descuento = parseFloat(prompt("Ingrese el descuento (por ejemplo, 15 para un 15% de descuento):"));
-        const precioTotalConDescuento = mostrarCarrito(carritoProductos) - (mostrarCarrito(carritoProductos) * descuento / 100);
-        console.log(`Precio total con descuento : $${precioTotalConDescuento.toFixed(2)}`);
-        break;
-
-      case "5":
-        console.log("Gracias por utilizar nuestro servicio. ¡Hasta luego!");
-        return;
-
-      default:
-        console.log("Opción inválida. Por favor, ingresa una opción válida.");
+agregarBtns.forEach((boton) => {
+  boton.addEventListener("click", () => {
+    const servicioAgregar = boton.getAttribute("data-servicio");
+    const cantidadAgregar = parseInt(prompt(`Ingrese la cantidad de ${servicioAgregar} a agregar:`));
+    
+    if (!isNaN(cantidadAgregar) && cantidadAgregar > 0) {
+      agregarProducto(carritoProductos, servicioAgregar, cantidadAgregar);
+      
+      const { descripcion } = servicios[servicioAgregar];
+      const li = document.createElement("li");
+      li.textContent = `${cantidadAgregar}x ${servicioAgregar}: ${descripcion}`;
+      carritoHTML.appendChild(li);
+      
+      guardarCarritoEnLocalStorage();
+      actualizarPrecioTotal();
+      alert(`Se han agregado ${cantidadAgregar}x ${servicioAgregar} al carrito.`);
+    } else {
+      alert("Por favor, ingresa una cantidad válida.");
     }
-  }
-};
+  });
+});
 
-interactuarConUsuario();
+eliminarBtn.addEventListener("click", () => {
+  const servicioEliminar = prompt("Ingrese el servicio a eliminar (botox, acido o vitaminaC):").toLowerCase();
+  const cantidadEliminar = parseInt(prompt("Ingrese la cantidad a eliminar:"));
+  if (!isNaN(cantidadEliminar) && cantidadEliminar > 0) {
+    eliminarProducto(carritoProductos, servicioEliminar, cantidadEliminar);
+    guardarCarritoEnLocalStorage();
+    actualizarPrecioTotal();
+    alert(`Se han eliminado ${cantidadEliminar}x ${servicioEliminar} del carrito.`);
+  } else {
+    alert("Por favor, ingresa una cantidad válida.");
+  }
+});
+
+mostrarBtn.addEventListener("click", () => {
+  carritoHTML.innerHTML = "";
+  mostrarCarrito(carritoProductos);
+});
+
+descuentoBtn.addEventListener("click", () => {
+  const descuento = parseFloat(prompt("Ingrese el descuento (por ejemplo, 15 para un 15% de descuento):"));
+  const precioTotal = mostrarCarrito(carritoProductos);
+  const precioTotalConDescuento = precioTotal - (precioTotal * descuento / 100);
+  precioActualizadoElement.textContent = `$${precioTotalConDescuento.toFixed(2)}`;
+  alert(`Precio total con descuento: $${precioTotalConDescuento.toFixed(2)}`);
+});
+
+salirBtn.addEventListener("click", () => {
+  alert("Gracias por utilizar nuestro servicio. ¡Hasta luego!");
+});
+
+function actualizarPrecioTotal() {
+  const precioTotal = mostrarCarrito(carritoProductos);
+  precioActualizadoElement.textContent = `$${precioTotal.toFixed(2)}`;
+}
