@@ -31,7 +31,22 @@
     margin-bottom: 10px;
   }
   
+  .cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    justify-items: center;
+  }
+  
+  .card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+    border-radius: 20px;
+  }
+  
   button {
+    text-align: center;
     padding: 10px 20px;
     font-size: 14px;
     background-color: #009688;
@@ -43,7 +58,7 @@
   }
   
   button:hover {
-    background-color: #00796b;
+    background-color: #39b8aa;
   }
   
   ul#carrito {
@@ -90,10 +105,10 @@
     margin-right: 10px;
   }
   
-  #salirBtn {
+  #limpiarBtn {
     background-color: #d32f2f;
   }
   
-  #salirBtn:hover {
-    background-color: #b71c1c;
+  #limpiarBtn:hover {
+    background-color: #7e1616;
   }
