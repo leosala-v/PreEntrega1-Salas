@@ -1,26 +1,36 @@
-const servicios = {};
+const servicios = {
+  botox: { precio: 100, descripcion: "Tratamiento de botox para rejuvenecer la piel." },
+  acido: { precio: 200, descripcion: "Tratamiento con ácido hialurónico para hidratar la piel." },
+  vitaminaC: { precio: 300, descripcion: "Tratamiento con vitamina C para mejorar la luminosidad de la piel." },
+  limpiezaFacial: { precio: 80, descripcion: "Tratamiento de limpieza facial para revitalizar la piel." },
+  microdermoabrasion: { precio: 150, descripcion: "Tratamiento de microdermoabrasión para exfoliar y renovar la piel." },
+  masajeRelajante: { precio: 120, descripcion: "Tratamiento de masaje relajante para aliviar tensiones y estrés." },
+  pedicuraSpa: { precio: 90, descripcion: "Tratamiento de pedicura spa para el cuidado y belleza de tus pies." },
+  tratamientoCapilar: { precio: 180, descripcion: "Tratamiento capilar para fortalecer y mejorar la salud del cabello." },
+};
+  // Profe, deje los objetos en JS para que queden constancia de los mimos ya que como comento en la ultima clase el JS debe tener hasta los arrays, pero los vincule directamente con el JSON. En una de las clases lo consulte y usted me dio el OK para que lso duplique. 
 
-const productos = [];
+const carritoProductos = [];
 const carritoHTML = document.getElementById("carrito");
 const precioActualizado = document.getElementById("precioActualizado");
 
 const cargarCarrito = () => {
   const carritoGuardado = localStorage.getItem("carrito");
   if (carritoGuardado) {
-    productos.push(...JSON.parse(carritoGuardado));
+    carritoProductos.push(...JSON.parse(carritoGuardado));
   }
 };
 
 const guardarCarritoEnLocalStorage = () => {
-  localStorage.setItem("carrito", JSON.stringify(productos));
+  localStorage.setItem("carrito", JSON.stringify(carritoProductos));
 };
 
 const actualizarCarritoHTML = () => {
-  carritoHTML.innerHTML = productos.map((producto) => `<li>${producto.cantidad}- ${producto.servicio}: ${servicios[producto.servicio]?.descripcion}</li>`).join('');
+  carritoHTML.innerHTML = carritoProductos.map((producto) => `<li>${producto.cantidad}- ${producto.servicio}: ${servicios[producto.servicio]?.descripcion}</li>`).join('');
 };
 
 const actualizarPrecioTotal = () => {
-  const precioTotal = productos.reduce((total, producto) => total + (servicios[producto.servicio]?.precio || 0) * producto.cantidad, 0);
+  const precioTotal = carritoProductos.reduce((total, producto) => total + (servicios[producto.servicio]?.precio || 0) * producto.cantidad, 0);
   precioActualizado.textContent = `$${precioTotal.toFixed(2)}`;
 };
 
@@ -41,13 +51,12 @@ window.addEventListener("load", async () => {
   actualizarPrecioTotal();
 });
 
-
 document.querySelectorAll(".agregar-producto").forEach((boton) => {
   boton.addEventListener("click", async () => {
-    const agregarServicio = boton.getAttribute("data-servicio");
+    const agregarServicio= boton.getAttribute("data-servicio");
     
     const { value: cantidadAgregar } = await Swal.fire({
-      title: `Cuantos productos desea agregar?`,
+      title: `Cuantos prodcutos desea agregar?`,
       icon: 'question',
       input: 'range',
       inputLabel: `Cantidad de ${agregarServicio} a agregar`,
@@ -61,11 +70,11 @@ document.querySelectorAll(".agregar-producto").forEach((boton) => {
 
     if (cantidadAgregar) {
       if (cantidadAgregar > 0) {
-        const productoExistente = productos.find((producto) => producto.servicio === agregarServicio);
+        const productoExistente = carritoProductos.find((producto) => producto.servicio === agregarServicio);
         if (productoExistente) {
           productoExistente.cantidad += cantidadAgregar;
         } else {
-          productos.push({ servicio: agregarServicio, cantidad: cantidadAgregar });
+          carritoProductos.push({ servicio: agregarServicio, cantidad: cantidadAgregar });
         }
         
         guardarCarritoEnLocalStorage();
@@ -93,7 +102,7 @@ document.getElementById("eliminarBtn").addEventListener("click", async () => {
         tratamientoCapilar: 'Tratamiento Capilar'
       }
     },
-    inputPlaceholder: 'Selecciona un producto',
+    inputPlaceholder: 'Seleccione un producto',
     showCancelButton: true,
     inputValidator: (value) => {
       return new Promise((resolve) => {
@@ -107,7 +116,7 @@ document.getElementById("eliminarBtn").addEventListener("click", async () => {
   });
   if (servicioEliminar) {
     const { value: eliminarProducto } = await Swal.fire({
-      title: 'Seleccionar cantidad a eliminar',
+      title: 'Seleccione cantidad a eliminar',
       icon: 'question',
       input: 'range',
       inputLabel: 'Cantidad a eliminar',
@@ -119,13 +128,13 @@ document.getElementById("eliminarBtn").addEventListener("click", async () => {
       inputValue: 1
     });
     if (eliminarProducto) {
-      const productoExistente = productos.find(producto => producto.servicio === servicioEliminar);
+      const productoExistente = carritoProductos.find(producto => producto.servicio === servicioEliminar);
       if (productoExistente) {
         productoExistente.cantidad -= eliminarProducto;
         if (productoExistente.cantidad <= 0) {
-          const index = productos.indexOf(productoExistente);
+          const index = carritoProductos.indexOf(productoExistente);
           if (index !== -1) {
-            productos.splice(index, 1);
+            carritoProductos.splice(index, 1);
           }
         }
         guardarCarritoEnLocalStorage();
@@ -138,6 +147,7 @@ document.getElementById("eliminarBtn").addEventListener("click", async () => {
     }
   }
 });
+
 
 document.getElementById("limpiarBtn").addEventListener("click", () => {
   const swalWithBootstrapButtons = Swal.mixin({
@@ -158,10 +168,11 @@ document.getElementById("limpiarBtn").addEventListener("click", () => {
     reverseButtons: true
   }).then((result) => {
     if (result.isConfirmed) {
-      productos.length = 0;
+      carritoProductos.length = 0;
       guardarCarritoEnLocalStorage();
       actualizarCarritoHTML();
       actualizarPrecioTotal();
-    }
-  })
+  }})
 });
+
+
