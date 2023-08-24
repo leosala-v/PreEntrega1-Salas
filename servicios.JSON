@@ -1,0 +1,10 @@
+{
+    "botox": { "precio": 100, "descripcion": "Tratamiento de botox para rejuvenecer la piel." },
+    "microdermoabrasion": { "precio": 150, "descripcion": "Tratamiento de microdermoabrasión para exfoliar y renovar la piel." },
+    "acido": { "precio": 200, "descripcion": "Tratamiento con ácido hialurónico para hidratar la piel." },
+    "vitaminaC": { "precio": 300, "descripcion": "Tratamiento con vitamina C para mejorar la luminosidad de la piel." },
+    "masajeRelajante": { "precio": 120, "descripcion": "Tratamiento de masaje relajante para aliviar tensiones y estrés." },
+    "limpiezaFacial": { "precio": 80, "descripcion": "Tratamiento de limpieza facial para revitalizar la piel." },
+    "tratamientoCapilar": { "precio": 180, "descripcion": "Tratamiento capilar para fortalecer y mejorar la salud del cabello." },
+    "pedicuraSpa": { "precio": 90, "descripcion": "Tratamiento de pedicura spa para el cuidado y belleza de tus pies." }
+  }
