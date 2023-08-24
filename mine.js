@@ -25,7 +25,7 @@ const guardarCarritoEnLocalStorage = () => {
 };
 
 const actualizarCarritoHTML = () => {
-  carritoHTML.innerHTML = carritoProductos.map((producto) => `<li>${producto.cantidad}x ${producto.servicio}: ${servicios[producto.servicio]?.descripcion}</li>`).join('');
+  carritoHTML.innerHTML = carritoProductos.map((producto) => `<li>${producto.cantidad}- ${producto.servicio}: ${servicios[producto.servicio]?.descripcion}</li>`).join('');
 };
 
 const actualizarPrecioTotal = () => {
@@ -41,13 +41,13 @@ window.addEventListener("load", () => {
 
 document.querySelectorAll(".agregar-producto").forEach((boton) => {
   boton.addEventListener("click", async () => {
-    const servicioAgregar = boton.getAttribute("data-servicio");
+    const agregarServicio= boton.getAttribute("data-servicio");
     
     const { value: cantidadAgregar } = await Swal.fire({
       title: `Cuantos prodcutos desea agregar?`,
       icon: 'question',
       input: 'range',
-      inputLabel: `Cantidad de ${servicioAgregar} a agregar`,
+      inputLabel: `Cantidad de ${agregarServicio} a agregar`,
       inputAttributes: {
         min: 1,
         max: 1000,
@@ -58,17 +58,17 @@ document.querySelectorAll(".agregar-producto").forEach((boton) => {
 
     if (cantidadAgregar) {
       if (cantidadAgregar > 0) {
-        const productoExistente = carritoProductos.find((producto) => producto.servicio === servicioAgregar);
+        const productoExistente = carritoProductos.find((producto) => producto.servicio === agregarServicio);
         if (productoExistente) {
           productoExistente.cantidad += cantidadAgregar;
         } else {
-          carritoProductos.push({ servicio: servicioAgregar, cantidad: cantidadAgregar });
+          carritoProductos.push({ servicio: agregarServicio, cantidad: cantidadAgregar });
         }
         
         guardarCarritoEnLocalStorage();
         actualizarCarritoHTML();
         actualizarPrecioTotal();
-        Swal.fire(`Se han agregado ${cantidadAgregar} ${servicioAgregar} al carrito.`);
+        Swal.fire(`Se han agregado ${cantidadAgregar} ${agregarServicio} al carrito.`);
       }
     }
   });
@@ -103,7 +103,7 @@ document.getElementById("eliminarBtn").addEventListener("click", async () => {
     }
   });
   if (servicioEliminar) {
-    const { value: cantidadEliminar } = await Swal.fire({
+    const { value: eliminarProducto } = await Swal.fire({
       title: 'Seleccionar cantidad a eliminar',
       icon: 'question',
       input: 'range',
@@ -115,10 +115,10 @@ document.getElementById("eliminarBtn").addEventListener("click", async () => {
       },
       inputValue: 1
     });
-    if (cantidadEliminar) {
+    if (eliminarProducto) {
       const productoExistente = carritoProductos.find(producto => producto.servicio === servicioEliminar);
       if (productoExistente) {
-        productoExistente.cantidad -= cantidadEliminar;
+        productoExistente.cantidad -= eliminarProducto;
         if (productoExistente.cantidad <= 0) {
           const index = carritoProductos.indexOf(productoExistente);
           if (index !== -1) {
@@ -128,12 +128,10 @@ document.getElementById("eliminarBtn").addEventListener("click", async () => {
         guardarCarritoEnLocalStorage();
         actualizarCarritoHTML();
         actualizarPrecioTotal();
-        Swal.fire(`Se han eliminado ${cantidadEliminar}x ${servicioEliminar} del carrito.`);
+        Swal.fire(`Se han eliminado ${eliminarProducto} ${servicioEliminar} del carrito.`);
       } else {
         Swal.fire("El producto no está en el carrito.");
       }
-    } else {
-      Swal.fire("Por favor, ingresa una cantidad válida.");
     }
   }
 });
@@ -149,8 +147,8 @@ document.getElementById("limpiarBtn").addEventListener("click", () => {
   })
   
   swalWithBootstrapButtons.fire({
-    title: '¿Esta seguro?',
-    text: "¡No podras recuperar tu carrito!",
+    title: '¿Está seguro?',
+    text: "Perderás todos los productos seleccionados.",
     icon: 'warning',
     showCancelButton: true,
     cancelButtonText: 'No, cancelar!',
@@ -165,11 +163,4 @@ document.getElementById("limpiarBtn").addEventListener("click", () => {
   }})
 });
 
-document.getElementById("descuentoBtn").addEventListener("click", () => {
-  const descuento = parseFloat(prompt("Ingrese el descuento (por ejemplo, 15 para un 15% de descuento):") || 0);
-  const precioTotal = carritoProductos.reduce((total, producto) => total + (servicios[producto.servicio]?.precio || 0) * producto.cantidad, 0);
-  const precioTotalConDescuento = precioTotal - (precioTotal * descuento / 100);
-  precioActualizado.textContent = `$${precioTotalConDescuento.toFixed(2)}`;
-  alert(`Precio total con descuento: $${precioTotalConDescuento.toFixed(2)}`);
-});
 

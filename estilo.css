@@ -22,7 +22,7 @@
   
   header {
     text-align: center;
-    background-color: #009688;
+    background-color: #7dc6bf;
     color: #fff;
     padding: 10px 0;
   }
@@ -34,7 +34,7 @@
   
   .cards-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 3fr));
     gap: 20px;
     justify-items: center;
   }
@@ -59,7 +59,7 @@
   }
   
   button:hover {
-    background-color: #39b8aa;
+    background-color: #325245;
   }
   
   ul#carrito {
@@ -75,10 +75,6 @@
     margin-bottom: 5px;
   }
   
-  #precioActualizado {
-    font-weight: bold;
-    color: #009688;
-  }
   
   .alert {
     background-color: #ffcc80;
@@ -87,24 +83,7 @@
     border-radius: 5px;
     margin-top: 10px;
   }
-  
-  input[type="text"], input[type="number"] {
-    padding: 8px;
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    margin: 5px 0;
-  }
-  
-  .input-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  .input-container input[type="text"] {
-    flex: 1;
-    margin-right: 10px;
-  }
+
   
   #limpiarBtn {
     background-color: #d32f2f;
@@ -113,3 +92,4 @@
   #limpiarBtn:hover {
     background-color: #7e1616;
   }
+  
