@@ -11,9 +11,9 @@ const servicios = {
 
 const carritoProductos = [];
 const carritoHTML = document.getElementById("carrito");
-const precioActualizadoElement = document.getElementById("precioActualizado");
+const precioActualizado = document.getElementById("precioActualizado");
 
-const cargarCarritoDesdeLocalStorage = () => {
+const cargarCarrito = () => {
   const carritoGuardado = localStorage.getItem("carrito");
   if (carritoGuardado) {
     carritoProductos.push(...JSON.parse(carritoGuardado));
@@ -25,84 +25,151 @@ const guardarCarritoEnLocalStorage = () => {
 };
 
 const actualizarCarritoHTML = () => {
-  carritoHTML.innerHTML = carritoProductos.map(producto => `<li>${producto.cantidad}x ${producto.servicio}: ${servicios[producto.servicio]?.descripcion}</li>`).join('');
+  carritoHTML.innerHTML = carritoProductos.map((producto) => `<li>${producto.cantidad}x ${producto.servicio}: ${servicios[producto.servicio]?.descripcion}</li>`).join('');
 };
 
 const actualizarPrecioTotal = () => {
   const precioTotal = carritoProductos.reduce((total, producto) => total + (servicios[producto.servicio]?.precio || 0) * producto.cantidad, 0);
-  precioActualizadoElement.textContent = `$${precioTotal.toFixed(2)}`;
+  precioActualizado.textContent = `$${precioTotal.toFixed(2)}`;
 };
 
 window.addEventListener("load", () => {
-  cargarCarritoDesdeLocalStorage();
+  cargarCarrito();
   actualizarCarritoHTML();
   actualizarPrecioTotal();
 });
 
-document.querySelectorAll(".agregar-producto").forEach(boton => {
-  boton.addEventListener("click", () => {
+document.querySelectorAll(".agregar-producto").forEach((boton) => {
+  boton.addEventListener("click", async () => {
     const servicioAgregar = boton.getAttribute("data-servicio");
-    const cantidadAgregar = parseInt(prompt(`Ingrese la cantidad de ${servicioAgregar} a agregar:`)) || 0;
+    
+    const { value: cantidadAgregar } = await Swal.fire({
+      title: `Cuantos prodcutos desea agregar?`,
+      icon: 'question',
+      input: 'range',
+      inputLabel: `Cantidad de ${servicioAgregar} a agregar`,
+      inputAttributes: {
+        min: 1,
+        max: 1000,
+        step: 1
+      },
+      inputValue: 1
+    });
 
-    if (cantidadAgregar > 0) {
-      const productoExistente = carritoProductos.find(producto => producto.servicio === servicioAgregar);
-      if (productoExistente) {
-        productoExistente.cantidad += cantidadAgregar;
-      } else {
-        carritoProductos.push({ servicio: servicioAgregar, cantidad: cantidadAgregar });
+    if (cantidadAgregar) {
+      if (cantidadAgregar > 0) {
+        const productoExistente = carritoProductos.find((producto) => producto.servicio === servicioAgregar);
+        if (productoExistente) {
+          productoExistente.cantidad += cantidadAgregar;
+        } else {
+          carritoProductos.push({ servicio: servicioAgregar, cantidad: cantidadAgregar });
+        }
+        
+        guardarCarritoEnLocalStorage();
+        actualizarCarritoHTML();
+        actualizarPrecioTotal();
+        Swal.fire(`Se han agregado ${cantidadAgregar} ${servicioAgregar} al carrito.`);
       }
-      
-      guardarCarritoEnLocalStorage();
-      actualizarCarritoHTML();
-      actualizarPrecioTotal();
-      alert(`Se han agregado ${cantidadAgregar}x ${servicioAgregar} al carrito.`);
-    } else {
-      alert("Por favor, ingresa una cantidad válida.");
     }
   });
 });
 
-document.getElementById("eliminarBtn").addEventListener("click", () => {
-  const servicioEliminar = prompt("Ingrese el servicio a eliminar: (botox, acido, vitaminaC, limpiezaFacial, microdermoabrasion, masajeRelajante, pedicuraSpa, tratamientoCapilar)").toLowerCase();
-  const cantidadEliminar = parseInt(prompt("Ingrese la cantidad a eliminar:") || 0);
-  if (cantidadEliminar > 0) {
-    const productoExistente = carritoProductos.find(producto => producto.servicio === servicioEliminar);
-    if (productoExistente) {
-      productoExistente.cantidad -= cantidadEliminar;
-      if (productoExistente.cantidad <= 0) {
-        const index = carritoProductos.indexOf(productoExistente);
-        if (index !== -1) {
-          carritoProductos.splice(index, 1);
-        }
+document.getElementById("eliminarBtn").addEventListener("click", async () => {
+  const { value: servicioEliminar } = await Swal.fire({
+    title: 'Seleccionar producto a eliminar',
+    input: 'select',
+    inputOptions: {
+      'Productos': {
+        botox: 'Botox',
+        acido: 'Ácido Hialurónico',
+        vitaminaC: 'Vitamina C',
+        limpiezaFacial: 'Limpieza Facial',
+        microdermoabrasion: 'Microdermoabrasión',
+        masajeRelajante: 'Masaje Relajante',
+        pedicuraSpa: 'Pedicura Spa',
+        tratamientoCapilar: 'Tratamiento Capilar'
       }
-      guardarCarritoEnLocalStorage();
-      actualizarCarritoHTML();
-      actualizarPrecioTotal();
-      alert(`Se han eliminado ${cantidadEliminar}x ${servicioEliminar} del carrito.`);
-    } else {
-      alert("El producto no está en el carrito.");
+    },
+    inputPlaceholder: 'Selecciona un producto',
+    showCancelButton: true,
+    inputValidator: (value) => {
+      return new Promise((resolve) => {
+        if (value) {
+          resolve();
+        } else {
+          resolve('Debes seleccionar un producto');
+        }
+      });
     }
-  } else {
-    alert("Por favor, ingresa una cantidad válida.");
+  });
+  if (servicioEliminar) {
+    const { value: cantidadEliminar } = await Swal.fire({
+      title: 'Seleccionar cantidad a eliminar',
+      icon: 'question',
+      input: 'range',
+      inputLabel: 'Cantidad a eliminar',
+      inputAttributes: {
+        min: 1,
+        max: 1000,
+        step: 1
+      },
+      inputValue: 1
+    });
+    if (cantidadEliminar) {
+      const productoExistente = carritoProductos.find(producto => producto.servicio === servicioEliminar);
+      if (productoExistente) {
+        productoExistente.cantidad -= cantidadEliminar;
+        if (productoExistente.cantidad <= 0) {
+          const index = carritoProductos.indexOf(productoExistente);
+          if (index !== -1) {
+            carritoProductos.splice(index, 1);
+          }
+        }
+        guardarCarritoEnLocalStorage();
+        actualizarCarritoHTML();
+        actualizarPrecioTotal();
+        Swal.fire(`Se han eliminado ${cantidadEliminar}x ${servicioEliminar} del carrito.`);
+      } else {
+        Swal.fire("El producto no está en el carrito.");
+      }
+    } else {
+      Swal.fire("Por favor, ingresa una cantidad válida.");
+    }
   }
 });
 
+
 document.getElementById("limpiarBtn").addEventListener("click", () => {
-  const confirmacion = confirm("¿Estás seguro de que deseas limpiar el carrito?");
-  if (confirmacion) {
-    carritoProductos.length = 0;
-    guardarCarritoEnLocalStorage();
-    actualizarCarritoHTML();
-    actualizarPrecioTotal();
-    alert("El carrito se ha limpiado.");
-  }
+  const swalWithBootstrapButtons = Swal.mixin({
+    customClass: {
+      confirmButton: 'btn btn-success',
+      cancelButton: 'btn btn-danger'
+    },
+    buttonsStyling: false
+  })
+  
+  swalWithBootstrapButtons.fire({
+    title: '¿Esta seguro?',
+    text: "¡No podras recuperar tu carrito!",
+    icon: 'warning',
+    showCancelButton: true,
+    cancelButtonText: 'No, cancelar!',
+    confirmButtonText: 'Si, eliminar carrito',
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      carritoProductos.length = 0;
+      guardarCarritoEnLocalStorage();
+      actualizarCarritoHTML();
+      actualizarPrecioTotal();
+  }})
 });
 
 document.getElementById("descuentoBtn").addEventListener("click", () => {
   const descuento = parseFloat(prompt("Ingrese el descuento (por ejemplo, 15 para un 15% de descuento):") || 0);
   const precioTotal = carritoProductos.reduce((total, producto) => total + (servicios[producto.servicio]?.precio || 0) * producto.cantidad, 0);
   const precioTotalConDescuento = precioTotal - (precioTotal * descuento / 100);
-  precioActualizadoElement.textContent = `$${precioTotalConDescuento.toFixed(2)}`;
+  precioActualizado.textContent = `$${precioTotalConDescuento.toFixed(2)}`;
   alert(`Precio total con descuento: $${precioTotalConDescuento.toFixed(2)}`);
 });
 
