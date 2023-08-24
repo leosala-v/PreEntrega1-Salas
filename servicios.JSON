@@ -8,3 +8,4 @@
     "tratamientoCapilar": { "precio": 180, "descripcion": "Tratamiento capilar para fortalecer y mejorar la salud del cabello." },
     "pedicuraSpa": { "precio": 90, "descripcion": "Tratamiento de pedicura spa para el cuidado y belleza de tus pies." }
   }
+  // Profe, no quedaron objetos en el JS porque los pase a JSON para poder vincularlos, usted en la ultima clase comento que debia estar todo en JS o por lo menos los arrays. Aclaro porque no se si aplica para objetos de igual manera.

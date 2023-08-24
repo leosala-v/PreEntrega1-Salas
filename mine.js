@@ -2,7 +2,7 @@ const servicios = {};
 
 const productos = [];
 const carritoHTML = document.getElementById("carrito");
-const precio = document.getElementById("precio");
+const precioActualizado = document.getElementById("precioActualizado");
 
 const cargarCarrito = () => {
   const carritoGuardado = localStorage.getItem("carrito");
@@ -11,17 +11,17 @@ const cargarCarrito = () => {
   }
 };
 
-const guardarCarrito = () => {
+const guardarCarritoEnLocalStorage = () => {
   localStorage.setItem("carrito", JSON.stringify(productos));
 };
 
-const mostrarCarritoHTML = () => {
+const actualizarCarritoHTML = () => {
   carritoHTML.innerHTML = productos.map((producto) => `<li>${producto.cantidad}- ${producto.servicio}: ${servicios[producto.servicio]?.descripcion}</li>`).join('');
 };
 
-const precioTotal = () => {
+const actualizarPrecioTotal = () => {
   const precioTotal = productos.reduce((total, producto) => total + (servicios[producto.servicio]?.precio || 0) * producto.cantidad, 0);
-  precio.textContent = `$${precioTotal.toFixed(2)}`;
+  precioActualizado.textContent = `$${precioTotal.toFixed(2)}`;
 };
 
 const cargarServiciosDesdeJSON = async () => {
@@ -37,8 +37,8 @@ const cargarServiciosDesdeJSON = async () => {
 window.addEventListener("load", async () => {
   await cargarServiciosDesdeJSON();
   cargarCarrito();
-  mostrarCarritoHTML();
-  precioTotal();
+  actualizarCarritoHTML();
+  actualizarPrecioTotal();
 });
 
 
@@ -61,16 +61,16 @@ document.querySelectorAll(".agregar-producto").forEach((boton) => {
 
     if (cantidadAgregar) {
       if (cantidadAgregar > 0) {
-        const productoExistente = carritoProductos.find((producto) => producto.servicio === agregarServicio);
+        const productoExistente = productos.find((producto) => producto.servicio === agregarServicio);
         if (productoExistente) {
           productoExistente.cantidad += cantidadAgregar;
         } else {
-          carritoProductos.push({ servicio: agregarServicio, cantidad: cantidadAgregar });
+          productos.push({ servicio: agregarServicio, cantidad: cantidadAgregar });
         }
         
-        guardarCarrito();
-        mostrarCarritoHTML();
-        precioTotal();
+        guardarCarritoEnLocalStorage();
+        actualizarCarritoHTML();
+        actualizarPrecioTotal();
         Swal.fire(`Se han agregado ${cantidadAgregar} ${agregarServicio} al carrito.`);
       }
     }
@@ -119,18 +119,18 @@ document.getElementById("eliminarBtn").addEventListener("click", async () => {
       inputValue: 1
     });
     if (eliminarProducto) {
-      const productoExistente = carritoProductos.find(producto => producto.servicio === servicioEliminar);
+      const productoExistente = productos.find(producto => producto.servicio === servicioEliminar);
       if (productoExistente) {
         productoExistente.cantidad -= eliminarProducto;
         if (productoExistente.cantidad <= 0) {
-          const index = carritoProductos.indexOf(productoExistente);
+          const index = productos.indexOf(productoExistente);
           if (index !== -1) {
-            carritoProductos.splice(index, 1);
+            productos.splice(index, 1);
           }
         }
-        guardarCarrito();
+        guardarCarritoEnLocalStorage();
         actualizarCarritoHTML();
-        precioTotal();
+        actualizarPrecioTotal();
         Swal.fire(`Se han eliminado ${eliminarProducto} ${servicioEliminar} del carrito.`);
       } else {
         Swal.fire("El producto no está en el carrito.");
@@ -158,10 +158,10 @@ document.getElementById("limpiarBtn").addEventListener("click", () => {
     reverseButtons: true
   }).then((result) => {
     if (result.isConfirmed) {
-      carritoProductos.length = 0;
-      guardarCarrito();
+      productos.length = 0;
+      guardarCarritoEnLocalStorage();
       actualizarCarritoHTML();
-      precioTotal();
+      actualizarPrecioTotal();
     }
   })
 });
