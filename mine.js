@@ -8,7 +8,7 @@ const servicios = {
   pedicuraSpa: { precio: 90, descripcion: "Tratamiento de pedicura spa para el cuidado y belleza de tus pies." },
   tratamientoCapilar: { precio: 180, descripcion: "Tratamiento capilar para fortalecer y mejorar la salud del cabello." },
 };
-  // Profe, deje los objetos en JS para que queden constancia de los mimos ya que como comento en la ultima clase el JS debe tener hasta los arrays, pero los vincule directamente con el JSON. En una de las clases lo consulte y usted me dio el OK para que lso duplique. 
+  // Profe, deje los objetos en JS para que queden constancia de los mimos ya que como comento en la ultima clase el JS debe tener hasta los arrays, pero los vincule directamente con el JSON. En una de las clases lo consulte y usted me dio el OK para que los duplique. 
 
 const carritoProductos = [];
 const carritoHTML = document.getElementById("carrito");
